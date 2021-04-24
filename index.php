@@ -86,9 +86,9 @@
 
 		require_once('vendor/autoload.php');
 
-		$stripe = new \Stripe\StripeClient(  'sk_test_51IjiJJBSSHiYRhIxgy0tVtrfRITbkghwTOj6CJP90yMES2AnDalqSJV3h3qFywBcX7E4kkZHp4RddM316gIlGc4X00nMGwbYsS' );
+		$stripe = new \Stripe\StripeClient(  'STRIPE_API_KEY' ); // REPLACE STRIPE_API_KEY WITH YOUR STRIPE API KEY
 
-		$invoices = $stripe->invoices->all(['limit' => 3])->data;
+		$invoices = $stripe->invoices->all(['limit' => 100])->data; // Indicate here the maximum number of report lines
 
 		foreach ($invoices as $invoice) {
 
@@ -120,7 +120,6 @@
 				$html.= '<div class="divTableCell">' . $invoice['customer_tax_exempt'] . '</div>';
 			$html.= '</div>';
 
-			//echo "<pre>"; print_r($invoice); echo "</pre>---";
 		}
 
 		$html.= "</div></div></body></html>";
@@ -132,7 +131,7 @@
         {
             try {
                 $mailchimp = new MailchimpTransactional\ApiClient();
-                $mailchimp->setApiKey('UvJi7AMv5Kj6wE4CIN3y0g');
+                $mailchimp->setApiKey('MAILCHIMP_API_KEY'); // REPLACE MAILCHIMP_API_KEY WITH YOUR MAILCHIMP API KEY
 
                 $response = $mailchimp->messages->send(["message" => $message]);
                 print_r($response);
@@ -142,7 +141,7 @@
         }
 
         $message = [
-            "from_email" => "test@gk.davidmorles.com",
+            "from_email" => "test@test.com",  // REPLACE WITH YOUR SENDER EMAIL
             "subject" => "Stripe report for BitKraken",
             "html" => $html,
             "to" => [
