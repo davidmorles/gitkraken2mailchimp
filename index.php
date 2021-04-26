@@ -1,6 +1,6 @@
 <?php
 	
-	if (empty($_POST))
+	if (empty($_POST)) 
 	{
 		?>
 			<html>
@@ -15,7 +15,13 @@
 			</html> 
 		<?php
 	} else {
+		
+		$ini = parse_ini_file('gk.ini');
+		require_once('vendor/autoload.php');
+		$stripe = new \Stripe\StripeClient( $ini['STRIPE_API_KEY'] );
 
+		$invoices = $stripe->invoices->all( ['limit' => 100] )->data; 
+		
 		$html = '
 			<html>
 			  <head>
@@ -84,11 +90,6 @@
 							<div class="divTableCell">customer_tax_exempt</div>
 						</div>';
 
-		require_once('vendor/autoload.php');
-
-		$stripe = new \Stripe\StripeClient(  'STRIPE_API_KEY' ); // REPLACE STRIPE_API_KEY WITH YOUR STRIPE API KEY
-
-		$invoices = $stripe->invoices->all(['limit' => 100])->data; // Indicate here the maximum number of report lines
 
 		foreach ($invoices as $invoice) {
 
@@ -121,27 +122,12 @@
 			$html.= '</div>';
 
 		}
-
 		$html.= "</div></div></body></html>";
 
-
-        echo $html;
-
-        function run($message)
-        {
-            try {
-                $mailchimp = new MailchimpTransactional\ApiClient();
-                $mailchimp->setApiKey('MAILCHIMP_API_KEY'); // REPLACE MAILCHIMP_API_KEY WITH YOUR MAILCHIMP API KEY
-
-                $response = $mailchimp->messages->send(["message" => $message]);
-                print_r($response);
-            } catch (Error $e) {
-                echo 'Error: ', $e->getMessage(), "\n";
-            }
-        }
+        echo $html; 
 
         $message = [
-            "from_email" => "test@test.com",  // REPLACE WITH YOUR SENDER EMAIL
+            "from_email" => "test@gk.davidmorles.com",
             "subject" => "Stripe report for BitKraken",
             "html" => $html,
             "to" => [
@@ -151,6 +137,15 @@
                 ]
             ]
         ];
-        run($message);
-	}
+
+		try {
+			$mailchimp = new MailchimpTransactional\ApiClient();
+			$mailchimp->setApiKey( $ini['MAILCHIMP_API_KEY'] );
+
+			$response = $mailchimp->messages->send( ["message" => $message] );
+			print_r($response);
+		} catch (Error $e) {
+			echo 'Error: ', $e->getMessage(), "\n";
+		}
+  }
 ?>
