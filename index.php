@@ -12,26 +12,26 @@
 		require('report.php');
 
 		// Obtain report from Stripe data
-
+		
 		$stripe = new \Stripe\StripeClient( $ini['stripe_api_key'] );
-		$html = report($stripe->invoices->all( ['limit' => 100] )->data); 
+		$html = report($stripe->invoices->all( ['limit' => $ini['max_lines']] )->data); 
 
 		// Echo report
 		
-        	echo $html; 
+		echo $html; 
 		
 		// Prepare email
 
 		$message = [
-		    'from_email' => $ini['from_email'],
-		    'subject' => $ini['email_subject'],
-		    'html' => $html,
-		    'to' => [
-			[
-			    'email' => $_POST['email'],
-			    'type' => 'to'
+			'from_email' => $ini['from_email'],
+			'subject' => $ini['email_subject'],
+			'html' => $html,
+			'to' => [
+				[
+				'email' => $_POST['email'],
+				'type' => 'to'
+				]
 			]
-		    ]
 		];
 		
 		// Send email
@@ -45,5 +45,5 @@
 		} catch (Error $e) {
 			echo 'Error: ', $e->getMessage(), '\n';
 		}
-  }
+ }
 ?>
