@@ -2,18 +2,7 @@
 	
 	if (empty($_POST)) 
 	{
-		?>
-			<html>
-			<body>
-
-			<form action="" method="post">
-			E-mail: <input type="email" name="email" placeholder="Enter your email"><br>
-			<input type="submit">
-			</form>
-
-			</body>
-			</html> 
-		<?php
+		require('form.html');
 	} else {
 
 		// Initialization
@@ -131,11 +120,11 @@
 		}
 		$html.= "</div></div></body></html>";
 
-	// Echo report
+		// Echo report
 		
         echo $html; 
 		
-	// Prepare email
+		// Prepare email
 
         $message = [
             'from_email' => $ini['from_email'],
