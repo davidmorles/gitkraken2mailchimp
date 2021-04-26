@@ -15,12 +15,18 @@
 			</html> 
 		<?php
 	} else {
+
+		// Initialization
 		
 		$ini = parse_ini_file('gk.ini');
 		require_once('vendor/autoload.php');
-		$stripe = new \Stripe\StripeClient( $ini['STRIPE_API_KEY'] );
+		$stripe = new \Stripe\StripeClient( $ini['stripe_api_key'] );
+		
+		// Read data from Stripe
 
 		$invoices = $stripe->invoices->all( ['limit' => 100] )->data; 
+		
+		// Report heading
 		
 		$html = '
 			<html>
@@ -90,6 +96,7 @@
 							<div class="divTableCell">customer_tax_exempt</div>
 						</div>';
 
+		// Report body
 
 		foreach ($invoices as $invoice) {
 
@@ -124,28 +131,34 @@
 		}
 		$html.= "</div></div></body></html>";
 
+	// Echo report
+		
         echo $html; 
+		
+	// Prepare email
 
         $message = [
-            "from_email" => "test@gk.davidmorles.com",
-            "subject" => "Stripe report for BitKraken",
-            "html" => $html,
-            "to" => [
+            'from_email' => $ini['from_email'],
+            'subject' => 'Stripe report for BitKraken',
+            'html' => $html,
+            'to' => [
                 [
-                    "email" => "$_POST[email]",
-                    "type" => "to"
+                    'email' => $_POST['email'],
+                    'type' => 'to'
                 ]
             ]
         ];
+		
+	// Send email & echo errors
 
-		try {
-			$mailchimp = new MailchimpTransactional\ApiClient();
-			$mailchimp->setApiKey( $ini['MAILCHIMP_API_KEY'] );
+	try {
+		$mailchimp = new MailchimpTransactional\ApiClient();
+		$mailchimp->setApiKey( $ini['mailchimp_api_key'] );
 
-			$response = $mailchimp->messages->send( ["message" => $message] );
-			print_r($response);
-		} catch (Error $e) {
-			echo 'Error: ', $e->getMessage(), "\n";
-		}
+		$response = $mailchimp->messages->send( ['message' => $message] );
+		print_r($response);
+	} catch (Error $e) {
+		echo 'Error: ', $e->getMessage(), '\n';
+	}
   }
 ?>
