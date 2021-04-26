@@ -11,30 +11,30 @@
 		require_once('vendor/autoload.php');
 		require('report.php');
 
-		// Read data from Stripe & obtain report
+		// Obtain report from Stripe data
 
 		$stripe = new \Stripe\StripeClient( $ini['stripe_api_key'] );
 		$html = report($stripe->invoices->all( ['limit' => 100] )->data); 
 
 		// Echo report
 		
-        echo $html; 
+        	echo $html; 
 		
 		// Prepare email
 
-        $message = [
-            'from_email' => $ini['from_email'],
-            'subject' => $ini['email_subject'],
-            'html' => $html,
-            'to' => [
-                [
-                    'email' => $_POST['email'],
-                    'type' => 'to'
-                ]
-            ]
-        ];
+		$message = [
+		    'from_email' => $ini['from_email'],
+		    'subject' => $ini['email_subject'],
+		    'html' => $html,
+		    'to' => [
+			[
+			    'email' => $_POST['email'],
+			    'type' => 'to'
+			]
+		    ]
+		];
 		
-		// Send email & echo errors
+		// Send email
 	
 		try {
 			$mailchimp = new MailchimpTransactional\ApiClient();
